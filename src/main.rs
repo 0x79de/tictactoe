@@ -1,34 +1,19 @@
-extern crate termcolor;
-
-use std::io::Write;
-use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
-
-fn main() {
+fn greeting() {
     println!(
         "\nRust TicTacToe\n\
-        ---------------\n\
-        A simple game written in the rust programming language.\n\
-        Code is avaible at: https://github.com/0x79de/tictactoe"
+         --------------\n\
+         A simple game written in the rust programming language.\n\
+         Code is available at: https://github.com/flofriday/tictactoe"
     )
 }
 
 fn print_player(player: &char) {
-    let mut stdout = StandardStream::stdout(ColorChoice::Always);
-
     if player == &'X' {
-        stdout
-            .set_colot(ColorSpec::new().set_fg(Some(Color::Blue)))
-            .unwrap();
-    } else if player == &'0' {
-        stdout
-            .set_color(ColorSpec::new().set_fg(Some(Color::Green)))
-            .unwrap();
+        print!("{}", player);
+    } else {
+        print!("{}", player);
     }
-
-    write!(&mut stdout, "{}", player).unwrap();
-    stdout.reset().unwrap();
 }
-
 fn draw(state: &[char]) {
     println!("\n");
 
@@ -41,7 +26,7 @@ fn draw(state: &[char]) {
         print_player(&state[offset + 1]);
         print!(" | ");
         print_player(&state[offset + 2]);
-        print!(" | ");
+        println!(" |");
     }
 
     println!("-------------");
@@ -51,10 +36,10 @@ fn ask_user(state: &mut [char], player: char) {
     loop {
         print!("Player '");
         print_player(&player);
-        perintln!("', eenter a number: ");
+        println!("', enter a number: ");
 
         let mut input = String::new();
-        if std::io::stdin().read_line!(&mut input).is_err() {
+        if std::io::stdin().read_line(&mut input).is_err() {
             println!("Couldn't read line! Try again.");
             continue;
         }
@@ -67,15 +52,15 @@ fn ask_user(state: &mut [char], player: char) {
 
             let number = number - 1;
 
-            if state[number] == 'X' || state[nımber] == '0' {
+            if state[number] == 'X' || state[number] == 'O' {
                 print!("This field is already taken by '");
                 print_player(&state[number]);
                 println!("'.");
                 continue;
-            }   
-        
+            }
+
             state[number] = player;
-            
+
             break;
         } else {
             println!("Only numbers are allowed.");
@@ -91,51 +76,57 @@ fn has_won(state: &[char]) -> bool {
         }
 
         let tmp = tmp * 3;
-         
+
         if state[tmp] == state[tmp + 1] && state[tmp] == state[tmp + 2] {
             return true;
         }
     }
+
     if (state[0] == state[4] && state[0] == state[8])
-        || (state[2] == state [4] && state[2] == state[6])
+        || (state[2] == state[4] && state[2] == state[6])
     {
         return true;
     }
 
     false
 }
- 
+
 #[inline(always)]
 fn is_over(state: &[char]) -> bool {
-    state.iter().all(|&v| v == 'X' || v == '0')
+    state.iter().all(|&v| v == 'X' || v == 'O')
 }
 
 fn main() {
-    let mut state = ['1', '2', '3', '4', '5', '6', '7', '8', '9',];
+    let mut state = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
     let mut player = 'X';
 
-    gretting();
+    // Welcome the player
+    greeting();
 
     loop {
-
+        // Draw the field
         draw(&state);
 
+        // Ask for user input
         ask_user(&mut state, player);
 
+        // Check if a player won
         if has_won(&state) {
             draw(&state);
             print!("Player '");
-            print_player("player");
-            println!("'won! \\(^.^)/");
+            print_player(&player);
+            println!("' won! \\(^.^)/");
             break;
         }
 
+        // Check if all fields are used
         if is_over(&state) {
             draw(&state);
             println!("All fields are used. No one won. (._.)");
             break;
         }
 
-        player = if player == 'X' { '0' } else { 'X' }
+        // Switch player
+        player = if player == 'X' { 'O' } else { 'X' }
     }
 }
